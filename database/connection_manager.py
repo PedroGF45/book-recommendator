@@ -25,7 +25,7 @@ class ConnectionManager:
             'port': str(os.getenv('DB_PORT', '5432')),
         }
 
-        self.log_manager.log("INFO", f"Database configuration loaded: {DB_CONFIG}")
+        self.log_manager.log("INFO", "Database configuration loaded")
         return DB_CONFIG
 
     def get_connection_pool(self) -> ConnectionPool:
