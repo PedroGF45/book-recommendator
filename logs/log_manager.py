@@ -22,3 +22,4 @@ class LogManager:
 
         with open(self.log_file_path, "a") as log_file:
             log_file.write(f"[{log_level}] {actual_time} {message}\n")
+            

@@ -63,3 +63,13 @@ try {
     Write-Host $_.Exception.Message -ForegroundColor Red
     exit 1
 }
+
+Write-Host "Starting uvicorn server..." -ForegroundColor Yellow
+try {
+    uvicorn app:app --reload
+    Write-Host "Uvicorn server started successfully!" -ForegroundColor Green
+} catch {
+    Write-Host "Failed to start uvicorn server" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    exit 1
+}
