@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+from psycopg_pool import ConnectionPool
 
 from logs.log_manager import LogManager
 
@@ -26,3 +27,14 @@ class ConnectionManager:
 
         self.log_manager.log("INFO", f"Database configuration loaded: {DB_CONFIG}")
         return DB_CONFIG
+
+    def get_connection_pool(self) -> ConnectionPool:
+        try:
+            pool = ConnectionPool(
+                f"dbname={self.DB_CONFIG['name']} user={self.DB_CONFIG['user']} password={self.DB_CONFIG['password']} host={self.DB_CONFIG['host']} port={self.DB_CONFIG['port']}"
+            )
+            self.log_manager.log("INFO", "Database connection pool created successfully.")
+            return pool
+        except Exception as e:
+            self.log_manager.log("ERROR", f"Error creating database connection pool: {e}")
+            raise
