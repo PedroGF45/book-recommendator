@@ -28,7 +28,7 @@ try {
 
 Write-Host "Creating database if it doesn't exist..." -ForegroundColor Yellow
 try {
-    docker exec book_recommendator_db psql -U dev_user -d postgres -c "CREATE DATABASE dev_book_recommendator_db;" 2>$null
+    docker exec book_recommendator_db psql -U dev_user -d postgres -c "CREATE DATABASE dev_book_recommendator_db IF NOT EXISTS;" 2>$null
     Write-Host "Database created or already exists" -ForegroundColor Green
 } catch {
     Write-Host "Database already exists or creation attempted" -ForegroundColor Yellow

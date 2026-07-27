@@ -1,10 +1,10 @@
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE books (
-    id SERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     title VARCHAR(100) NOT NULL,
     author VARCHAR(100) NOT NULL,
     genres VARCHAR(100) NOT NULL,
@@ -14,8 +14,8 @@ CREATE TABLE books (
 CREATE TYPE reading_status AS ENUM ('reading', 'completed', 'on-hold', 'dropped', 'plan to read');
 
 CREATE TABLE user_books (
-    user_id INT NOT NULL,
-    book_id INT NOT NULL,
+    user_id BIGINT NOT NULL,
+    book_id BIGINT NOT NULL,
     status reading_status NOT NULL,
     rating FLOAT CHECK (rating BETWEEN 1.0 AND 5.0),
     review TEXT,
