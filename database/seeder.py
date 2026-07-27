@@ -13,8 +13,6 @@ class Seeder():
 
         self.check_seed_schema_file_exists()
 
-        self.seed_database()
-
     def check_seed_schema_file_exists(self):
         if not os.path.exists(self.seed_schema_path):
             self.log_manager.log("ERROR", f"Seed schema file not found: {self.seed_schema_path}")
