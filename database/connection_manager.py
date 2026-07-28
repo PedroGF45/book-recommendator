@@ -10,6 +10,7 @@ class ConnectionManager:
 
         self.log_manager = log_manager
         self.DB_CONFIG = self.get_database_config()
+        self._pool = self._initialize_connection_pool()
         
     def get_database_config(self) -> dict[str, str]:
         try:
@@ -28,13 +29,23 @@ class ConnectionManager:
         self.log_manager.log("INFO", "Database configuration loaded")
         return DB_CONFIG
 
-    def get_connection_pool(self) -> ConnectionPool:
+    def _initialize_connection_pool(self) -> ConnectionPool:
         try:
-            pool = ConnectionPool(
-                f"dbname={self.DB_CONFIG['name']} user={self.DB_CONFIG['user']} password={self.DB_CONFIG['password']} host={self.DB_CONFIG['host']} port={self.DB_CONFIG['port']}"
-            )
+            conn_info = f"dbname={self.DB_CONFIG['name']} user={self.DB_CONFIG['user']} password={self.DB_CONFIG['password']} host={self.DB_CONFIG['host']} port={self.DB_CONFIG['port']}"
+            pool = ConnectionPool(conn_info, open=True, max_size=10, max_lifetime=300)
             self.log_manager.log("INFO", "Database connection pool created successfully.")
             return pool
         except Exception as e:
             self.log_manager.log("ERROR", f"Error creating database connection pool: {e}")
+            raise
+
+    def get_connection_pool(self) -> ConnectionPool:
+        return self._pool
+
+    def close_connection_pool(self):
+        try:
+            self._pool.close()
+            self.log_manager.log("INFO", "Database connection pool closed successfully.")
+        except Exception as e:
+            self.log_manager.log("ERROR", f"Error closing database connection pool: {e}")
             raise

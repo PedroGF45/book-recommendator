@@ -64,6 +64,17 @@ try {
     exit 1
 }
 
+Write-Host "Seeding database with initial data..." -ForegroundColor Yellow
+try {
+    docker cp database\seeds.sql book_recommendator_db:/tmp/seeds.sql
+    docker exec book_recommendator_db psql -U dev_user -d dev_book_recommendator_db -f /tmp/seeds.sql
+    Write-Host "Database seeded successfully!" -ForegroundColor Green
+} catch {
+    Write-Host "Failed to seed database" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    exit 1
+}
+
 Write-Host "Starting uvicorn server..." -ForegroundColor Yellow
 try {
     uvicorn app:app --reload

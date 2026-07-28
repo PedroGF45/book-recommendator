@@ -1,18 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Recommendation Engine</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-900 text-gray-100 min-h-screen">
-    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-indigo-400">📚 BookRecommendator</h1>
-    </nav>
+{% extends "base.html" %}
 
-    <main class="container mx-auto px-4 py-8">
-        {% block content %}{% endblock %}
-    </main>
-</body>
-</html>
+{% block content %}
+<div class="mb-8 bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md">
+    <h2 class="text-xl font-semibold mb-3 text-indigo-300">Quick Add by ISBN</h2>
+    <form action="/books/add-isbn" method="POST" class="flex gap-4">
+        <input type="text" name="isbn" placeholder="e.g. 9780135957059" required 
+               class="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500">
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-2 rounded-lg transition">
+            Fetch & Save
+        </button>
+    </form>
+    {% if error %}
+    <p class="text-red-400 mt-2 text-sm">{{ error }}</p>
+    {% endif %}
+</div>
+
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Library Catalog</h2>
+    <span class="text-gray-400 text-sm">Total Books: {{ books|length }}</span>
+</div>
+
+{% if books %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for book in books %}
+    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col justify-between shadow-md hover:border-indigo-500 transition">
+        <div>
+            <div class="flex justify-between items-start mb-2">
+                <h3 class="text-xl font-bold text-white leading-snug">{{ book.title }}</h3>
+            </div>
+            <p class="text-indigo-400 font-medium text-sm mb-3">By {{ book.author }}</p>
+            {% if book.genres %}
+            {% for genre in book.genres.split(',') %}
+            <span class="inline-block bg-gray-700 text-xs px-2.5 py-1 rounded-full text-gray-300 mb-3">
+                {{ genre.strip() }}
+            </span>
+            {% endfor %}
+            {% endif %}
+            <p class="text-gray-400 text-sm line-clamp-3 mb-4">
+                {{ book.description or "No description available." }}
+            </p>
+        </div>
+        
+        <div class="border-t border-gray-700 pt-4 flex justify-between items-center">
+            <span class="text-xs font-mono text-gray-500">ISBN: {{ book.isbn or 'N/A' }}</span>
+            <div class="flex gap-2">
+                <a href="/books/{{ book.id }}/edit" class="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded transition">Edit</a>
+                <form action="/books/{{ book.id }}/delete" method="POST" onsubmit="return confirm('Delete this book?');">
+                    <button type="submit" class="text-sm bg-red-600/80 hover:bg-red-600 px-3 py-1.5 rounded transition">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-16 bg-gray-800/50 rounded-xl border border-dashed border-gray-700">
+    <p class="text-gray-400">No books found in the database. Fetch one via ISBN or add a book manually!</p>
+</div>
+{% endif %}
+{% endblock %}
