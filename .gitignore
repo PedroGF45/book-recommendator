@@ -219,3 +219,6 @@ __marimo__/
 
 # VsCode settings
 .vscode/
+
+# data folder
+data/

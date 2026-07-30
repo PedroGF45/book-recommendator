@@ -1,15 +1,24 @@
-from database.connection_manager import ConnectionManager
-from logs.log_manager import LogManager
+# read json first n objects
+import json
 
-log_manager = LogManager()
-connection_manager = ConnectionManager(log_manager=log_manager)
-connection_pool = connection_manager.get_connection_pool()
+def read_json_first_n_objects(file_path, n) -> list[dict]:
+    with open(file_path, 'r') as file:
+        objects = []
+        for _ in range(n):
+            line = file.readline()
+            if not line:
+                break
+            objects.append(json.loads(line.strip()))
+    return objects
 
-with connection_pool.connection() as conn:
-    try:
-        cursor = conn.execute("SELECT * FROM books;")
-        for row in cursor:
-            log_manager.log("INFO", f"Book: {row}")
-        log_manager.log("INFO", "Query executed successfully.")
-    except Exception as e:
-        log_manager.log("ERROR", f"Error executing query: {e}")
+
+def main():
+    file_path = 'C:\\Users\\pedro\\Downloads\\goodreads_reviews_dedup.json\\goodreads_reviews_dedup.json'  # Replace with your JSON file path
+    first_100_objects = read_json_first_n_objects(file_path, 20)
+    for book in first_100_objects:
+        print(book)
+        #print(f'ISBN: {book.get("isbn")} or ISBN13: {book.get("isbn13")}')
+        #print(f'ISBN: {book.get("isbn")}, Title: {book.get("title")}, Author: {book.get("authors")[0].get("author_id")}, Publisher: {book.get("publisher")}, Publication Year: {book.get("publication_year")}, Number of Pages: {book.get("num_pages")}, Ratings Count: {book.get("ratings_count")}, Average Rating: {book.get("average_rating")}, Description: {book.get("description")}')
+        print("\n")
+if __name__ == "__main__":
+    main()
