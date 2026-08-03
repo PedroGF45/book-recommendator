@@ -19,8 +19,6 @@ CREATE TABLE books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TYPE reading_status AS ENUM ('reading', 'completed', 'on-hold', 'dropped', 'plan to read');
-
 CREATE TABLE user_book_reviews (
     user_id BIGINT NOT NULL,
     book_id BIGINT NOT NULL,
