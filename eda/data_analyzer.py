@@ -18,7 +18,7 @@ class DataAnalyzer:
 
     def perform_full_analysis(self, parquet_file_path: str, figsize: tuple[int, int] = (10, 8), annot: bool = True, cmap: str = 'coolwarm', fmt: str = ".2f", prefix: str = "data", sample_size: int = 1000):
 
-        self.data = self.parquet_handler.scan_parquet(parquet_file_path)
+        self.data = self.parquet_handler.read_parquet(parquet_file_path)
 
         self._check_and_create_output_directory()
 
