@@ -1,18 +1,19 @@
 import polars as pl
-import psycopg
 from tqdm import tqdm
 from database.connection_manager import ConnectionManager
 from logs.log_manager import LogManager
+from utils.parquet_handler import ParquetHandler
 
 class ParquetDbSeeder:
-    def __init__(self, log_manager: LogManager, connection_manager: ConnectionManager):
+    def __init__(self, log_manager: LogManager, connection_manager: ConnectionManager, parquet_handler: ParquetHandler):
         self.log_manager = log_manager
         self.connection_manager = connection_manager
+        self.parquet_handler = parquet_handler
 
     def seed_books(self, books_parquet_path: str, batch_size: int = 100_000):
         self.log_manager.log("INFO", f"Seeding books from {books_parquet_path}...")
         
-        lazy_books = pl.scan_parquet(books_parquet_path)
+        lazy_books = self.parquet_handler.scan_parquet(books_parquet_path)
         total_rows = lazy_books.select(pl.len()).collect().item()
 
         pool = self.connection_manager.get_connection_pool()
@@ -49,7 +50,7 @@ class ParquetDbSeeder:
     def seed_users(self, users_parquet_path: str, batch_size: int = 100_000):
         self.log_manager.log("INFO", f"Seeding users from {users_parquet_path}...")
         
-        lazy_users = pl.scan_parquet(users_parquet_path)
+        lazy_users = self.parquet_handler.scan_parquet(users_parquet_path)
         total_rows = lazy_users.select(pl.len()).collect().item()
 
         pool = self.connection_manager.get_connection_pool()
@@ -85,7 +86,7 @@ class ParquetDbSeeder:
                     ) ON COMMIT DROP;
                 """)
 
-                lazy_reviews = pl.scan_parquet(reviews_parquet_path)
+                lazy_reviews = self.parquet_handler.scan_parquet(reviews_parquet_path)
                 total_rows = lazy_reviews.select(pl.len()).collect().item()
 
                 with tqdm(total=total_rows, desc="Staging Reviews", unit="rows") as pbar:

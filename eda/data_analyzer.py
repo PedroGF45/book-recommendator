@@ -7,16 +7,18 @@ import os
 from itertools import combinations
 
 from logs.log_manager import LogManager
+from utils.parquet_handler import ParquetHandler
 
 class DataAnalyzer:
-    def __init__(self, log_manager: LogManager, output_path: str = "eda/plots"):
+    def __init__(self, log_manager: LogManager, parquet_handler: ParquetHandler, output_path: str = "eda/plots"):
         self.log_manager = log_manager
+        self.parquet_handler = parquet_handler
         self.output_path = output_path
         self.data = None
 
     def perform_full_analysis(self, parquet_file_path: str, figsize: tuple[int, int] = (10, 8), annot: bool = True, cmap: str = 'coolwarm', fmt: str = ".2f", prefix: str = "data", sample_size: int = 1000):
 
-        self._load_data(parquet_file_path)
+        self.data = self.parquet_handler.scan_parquet(parquet_file_path)
 
         self._check_and_create_output_directory()
 
@@ -36,14 +38,6 @@ class DataAnalyzer:
         # 5. Skewness and Kurtosis
         self.analyze_skewness()
         self.analyze_kurtosis()
-
-    def _load_data(self, parquet_file_path: str):
-        try:
-            self.data = pl.read_parquet(parquet_file_path)
-            self.log_manager.log("INFO", f"Data loaded successfully from {parquet_file_path}")
-        except Exception as e:
-            self.log_manager.log("ERROR", f"Failed to load data from {parquet_file_path}: {e}")
-            raise
 
     def _check_and_create_output_directory(self):
         if not os.path.exists(self.output_path):
